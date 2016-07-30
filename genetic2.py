@@ -2,7 +2,9 @@
 import random
 import math
 import numpy as np
-from mayavi import mlab
+from mpl_toolkits.mplot3d import axes3d
+import matplotlib.pyplot as plt
+from matplotlib import cm
 
 #通过遗传算法求 f(x,y)=y*sin(x)+x*sin(y) 在 x,y in [-10,10] 的极值
 #染色体 基因X 基因Y
@@ -65,7 +67,7 @@ def fitness(chromosome_states):
         z = y * math.sin(x) + x * math.cos(y)
         print x, y, z
         #-------------------
-        points3d(x,y,z)
+        #points3d(x,y,z)
         #-------------------
         fitnesses.append(z)
 
@@ -107,15 +109,29 @@ def mutation(chromosome_states):
         y = chromosome_state[1][:pos] + str(int(not int(chromosome_state[1][pos]))) + chromosome_state[1][pos+1:]
         chromosome_states[index] = [x, y]
 
+#生成初始3D模型
 def init_3d_model():
-    x, y = np.ogrid[-10:10:50j, -10:10:50j]
-    z = y * np.sin(x) + x * np.cos(y)
 
-    pl = mlab.surf(x, y, z, warp_scale="auto")
-    #s = mlab.
-    mlab.axes(xlabel='x', ylabel='y', zlabel='z')
-    mlab.outline(pl)
+    fig = plt.figure()
+    ax = fig.gca(projection='3d')
 
+    X, Y = np.ogrid[-10:10:50j, -10:10:50j]
+    X, Y = np.meshgrid(X, Y)
+    Z = Y * np.sin(X) + X * np.cos(Y)
+
+
+    #x, y, z = axes3d.get_test_data(0.05)
+    ax.plot_surface(X, Y, Z, rstride=1, cstride=1, alpha=0.3, linewidth=0.1, cmap=cm.coolwarm)
+    #cset = ax.contourf(X, Y, Z, zdir='z', offset=-10, cmap=cm.coolwarm)
+
+    ax.set_xlabel('X')
+    ax.set_xlim(-10, 10)
+    ax.set_ylabel('Y')
+    ax.set_ylim(-10, 10)
+    ax.set_zlabel('Z')
+    ax.set_zlim(-20, 20)
+
+    plt.show()
 
 if __name__ == '__main__':
     chromosome_states = init()
